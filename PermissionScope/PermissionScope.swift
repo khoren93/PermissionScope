@@ -93,14 +93,14 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
 	// Useful for direct use of the request* methods
     
     /// Callback called when permissions status change.
-    public var onAuthChange: authClosureType? = nil
+    @objc public var onAuthChange: authClosureType? = nil
     /// Callback called when the user taps on the close button.
-    public var onCancel: cancelClosureType?   = nil
+    @objc public var onCancel: cancelClosureType?   = nil
     
     /// Called when the user has disabled or denied access to notifications, and we're presenting them with a help dialog.
     public var onDisabledOrDenied: cancelClosureType? = nil
 	/// View controller to be used when presenting alerts. Defaults to self. You'll want to set this if you are calling the `request*` methods directly.
-	public var viewControllerForAlerts : UIViewController?
+	@objc public var viewControllerForAlerts : UIViewController?
 
     /**
     Checks whether all the configured permission are authorized or not.
@@ -394,7 +394,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusLocationAlways() -> PermissionStatus {
+    @objc public func statusLocationAlways() -> PermissionStatus {
         guard CLLocationManager.locationServicesEnabled() else { return .disabled }
 
         let status = CLLocationManager.authorizationStatus()
@@ -419,7 +419,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to LocationAlways, if necessary.
     */
-    public func requestLocationAlways() {
+    @objc public func requestLocationAlways() {
     	let hasAlwaysKey:Bool = !Bundle.main
     		.object(forInfoDictionaryKey: Constants.InfoPlistKeys.locationAlways).isNil
     	assert(hasAlwaysKey, Constants.InfoPlistKeys.locationAlways + " not found in Info.plist.")
@@ -446,7 +446,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusLocationInUse() -> PermissionStatus {
+    @objc public func statusLocationInUse() -> PermissionStatus {
         guard CLLocationManager.locationServicesEnabled() else { return .disabled }
         
         let status = CLLocationManager.authorizationStatus()
@@ -465,7 +465,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to LocationWhileInUse, if necessary.
     */
-    public func requestLocationInUse() {
+    @objc public func requestLocationInUse() {
     	let hasWhenInUseKey :Bool = !Bundle.main
     		.object(forInfoDictionaryKey: Constants.InfoPlistKeys.locationWhenInUse).isNil
     	assert(hasWhenInUseKey, Constants.InfoPlistKeys.locationWhenInUse + " not found in Info.plist.")
@@ -490,7 +490,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusContacts() -> PermissionStatus {
+    @objc public func statusContacts() -> PermissionStatus {
         if #available(iOS 9.0, *) {
             let status = CNContactStore.authorizationStatus(for: .contacts)
             switch status {
@@ -518,7 +518,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to Contacts, if necessary.
     */
-    public func requestContacts() {
+    @objc public func requestContacts() {
         let status = statusContacts()
         switch status {
         case .unknown:
@@ -546,7 +546,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusNotifications() -> PermissionStatus {
+    @objc public func statusNotifications() -> PermissionStatus {
         let settings = UIApplication.shared.currentUserNotificationSettings
         if let settingTypes = settings?.types , settingTypes != UIUserNotificationType() {
             return .authorized
@@ -569,7 +569,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     This function is called when we want to show the notifications
     alert, kicking off the entire process.
     */
-    func showingNotificationPermission() {
+    @objc func showingNotificationPermission() {
         let notifCenter = NotificationCenter.default
         
         notifCenter
@@ -596,7 +596,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     See `showingNotificationPermission` for a more detailed description
     of the entire process.
     */
-    func finishedShowingNotificationPermission () {
+    @objc func finishedShowingNotificationPermission () {
         NotificationCenter.default.removeObserver(self,
             name: NSNotification.Name.UIApplicationWillResignActive,
             object: nil)
@@ -628,7 +628,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to User Notifications, if necessary.
     */
-    public func requestNotifications() {
+    @objc public func requestNotifications() {
         let status = statusNotifications()
         switch status {
         case .unknown:
@@ -660,7 +660,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusMicrophone() -> PermissionStatus {
+    @objc public func statusMicrophone() -> PermissionStatus {
         let recordPermission = AVAudioSession.sharedInstance().recordPermission()
         switch recordPermission {
         case AVAudioSessionRecordPermission.denied:
@@ -675,7 +675,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to the Microphone, if necessary.
     */
-    public func requestMicrophone() {
+    @objc public func requestMicrophone() {
         let status = statusMicrophone()
         switch status {
         case .unknown:
@@ -698,8 +698,8 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusCamera() -> PermissionStatus {
-        let status = AVCaptureDevice.authorizationStatus(forMediaType: AVMediaTypeVideo)
+    @objc public func statusCamera() -> PermissionStatus {
+        let status = AVCaptureDevice.authorizationStatus(for: AVMediaType.video)
         switch status {
         case .authorized:
             return .authorized
@@ -713,11 +713,11 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to the Camera, if necessary.
     */
-    public func requestCamera() {
+    @objc public func requestCamera() {
         let status = statusCamera()
         switch status {
         case .unknown:
-            AVCaptureDevice.requestAccess(forMediaType: AVMediaTypeVideo,
+            AVCaptureDevice.requestAccess(for: AVMediaType.video,
                 completionHandler: { granted in
                     self.detectAndCallback()
             })
@@ -737,7 +737,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusPhotos() -> PermissionStatus {
+    @objc public func statusPhotos() -> PermissionStatus {
         let status = PHPhotoLibrary.authorizationStatus()
         switch status {
         case .authorized:
@@ -752,7 +752,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to Photos, if necessary.
     */
-    public func requestPhotos() {
+    @objc public func requestPhotos() {
         let status = statusPhotos()
         switch status {
         case .unknown:
@@ -775,7 +775,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusReminders() -> PermissionStatus {
+    @objc public func statusReminders() -> PermissionStatus {
         let status = EKEventStore.authorizationStatus(for: .reminder)
         switch status {
         case .authorized:
@@ -790,7 +790,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to Reminders, if necessary.
     */
-    public func requestReminders() {
+    @objc public func requestReminders() {
         let status = statusReminders()
         switch status {
         case .unknown:
@@ -812,7 +812,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     
     - returns: Permission status for the requested type.
     */
-    public func statusEvents() -> PermissionStatus {
+    @objc public func statusEvents() -> PermissionStatus {
         let status = EKEventStore.authorizationStatus(for: .event)
         switch status {
         case .authorized:
@@ -827,7 +827,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Requests access to Events, if necessary.
     */
-    public func requestEvents() {
+    @objc public func requestEvents() {
         let status = statusEvents()
         switch status {
         case .unknown:
@@ -1119,7 +1119,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     /**
     Called when the users taps on the close button.
     */
-    func cancel() {
+    @objc func cancel() {
         self.hide()
         
         if let onCancel = onCancel {
@@ -1205,7 +1205,7 @@ typealias resultsForConfigClosure     = ([PermissionResult]) -> Void
     button to check on a disabled permission. It calls detectAndCallback
     to recheck all the permissions and update the UI.
     */
-    func appForegroundedAfterSettings() {
+    @objc func appForegroundedAfterSettings() {
         NotificationCenter.default.removeObserver(self, name: NSNotification.Name.UIApplicationDidBecomeActive, object: nil)
         
         detectAndCallback()
